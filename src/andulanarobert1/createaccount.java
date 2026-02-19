@@ -280,23 +280,23 @@ public class createaccount extends javax.swing.JFrame {
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         // TODO add your handling code here:
-        Connection con = DatabaseConnection.dbConnection();
-        PreparedStatement pst;
-        ResultSet rs;
-        DefaultTableModel dtm = (DefaultTableModel) SampleTable.getModel();
-        dtm.setRowCount(0);
-        try{
-            pst = con.prepareStatement("Select * From users ORDER BY last_name ASC");
-            rs = pst.executeQuery();
-            while(rs.next()){
-                Object obj[] = {rs.getInt("user_id"), rs.getString("last_name"), rs.getString("first_name"), 
-                rs.getString("address"), rs.getString("role")};
-                dtm.addRow(obj);
-            }
-        }
-        catch(SQLException ex){
-            System.out.println(ex);
-        }
+       // Connection con = DatabaseConnection.dbConnection();
+       // PreparedStatement pst;
+       // ResultSet rs;
+       // DefaultTableModel dtm = (DefaultTableModel) SampleTable.getModel();
+        //dtm.setRowCount(0);
+       // try{
+           // pst = con.prepareStatement("Select * From users ORDER BY last_name ASC");
+           // rs = pst.executeQuery();
+           // while(rs.next()){
+           //     Object obj[] = {rs.getInt("user_id"), rs.getString("last_name"), rs.getString("first_name"), 
+           //     rs.getString("address"), rs.getString("role")};
+            //    dtm.addRow(obj);
+            
+        
+        //catch(SQLException ex){
+         //   System.out.println(ex);
+        //}
     }//GEN-LAST:event_formWindowActivated
 
     /**
