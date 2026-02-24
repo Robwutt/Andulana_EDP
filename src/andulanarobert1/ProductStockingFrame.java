@@ -4,6 +4,8 @@
  */
 package andulanarobert1;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.YES_OPTION;
 
@@ -79,6 +81,11 @@ public class ProductStockingFrame extends javax.swing.JFrame {
         remarkfield = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
         InfoPanel.setBackground(new java.awt.Color(255, 255, 255));
         InfoPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -600,6 +607,11 @@ unitCostfield.setText("");
 sellPricefield.setText("");
 categbox.setSelectedItem(0);
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        // TODO add your handling code here:
+       
+    }//GEN-LAST:event_formWindowActivated
 
     /**
      * @param args the command line arguments

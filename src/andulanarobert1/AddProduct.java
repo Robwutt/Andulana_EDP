@@ -72,6 +72,11 @@ public class AddProduct extends javax.swing.JFrame {
         jLabel17 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         getContentPane().add(jProduct_id, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, 250, -1));
 
@@ -408,6 +413,12 @@ sComboBox.setSelectedItem(0);
     private void jSupplier1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSupplier1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jSupplier1ActionPerformed
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        // TODO add your handling code here:
+   
+        
+    }//GEN-LAST:event_formWindowActivated
 
     /**
      * @param args the command line arguments
