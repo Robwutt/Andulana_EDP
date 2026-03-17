@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import javax.swing.table.DefaultTableModel;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.YES_OPTION;
 
 /**
  *
@@ -21,7 +22,74 @@ public class createaccount extends javax.swing.JFrame {
      */
     public createaccount() {
         initComponents();
+        jaccTable.addMouseListener(new java.awt.event.MouseAdapter() {
+    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        int selectedRow = jaccTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            jUserid.setText(jaccTable.getValueAt(selectedRow, 0).toString());
+            jFirstName1.setText(jaccTable.getValueAt(selectedRow, 1).toString());
+            jMiddleName.setText(jaccTable.getValueAt(selectedRow, 2).toString());
+            jLastName.setText(jaccTable.getValueAt(selectedRow, 3).toString());
+            jUserName.setText(jaccTable.getValueAt(selectedRow, 4).toString());
+            jRole1.setSelectedItem(jaccTable.getValueAt(selectedRow, 5).toString());
+            jEmail.setText(jaccTable.getValueAt(selectedRow, 6).toString());
+            jPhoneNumber.setText(jaccTable.getValueAt(selectedRow, 7).toString());
+            jPassword.setText(jaccTable.getValueAt(selectedRow, 8).toString());
+            jRole.setSelectedItem(jaccTable.getValueAt(selectedRow, 9).toString());
+        }
     }
+});
+        this.addMouseListener(new java.awt.event.MouseAdapter() {
+    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        jaccTable.clearSelection(); // deselect table
+        clearFields();
+        
+    }
+});
+    }
+    
+    private void clearFields() {
+    jUserid.setText("");
+    jFirstName1.setText("");
+    jMiddleName.setText("");
+    jLastName.setText("");
+    jUserName.setText("");
+    jRole1.setSelectedIndex(0);
+    jEmail.setText("");
+    jPhoneNumber.setText("");
+    jPassword.setText("");
+    jRole.setSelectedIndex(0);
+}
+    
+
+    
+private void loadUserTable() {
+    Connection con = DatabaseConnection.dbConnection();
+    DefaultTableModel dtm = (DefaultTableModel) jaccTable.getModel();
+    dtm.setRowCount(0);
+
+    try {
+        ResultSet rs = con.prepareStatement("SELECT * FROM users ORDER BY user_id ASC").executeQuery();
+        while (rs.next()) {
+            Object[] obj = {
+                rs.getInt("user_id"),
+                rs.getString("first_name"),
+                rs.getString("middle_name"),
+                rs.getString("last_name"),
+                rs.getString("username"),
+                rs.getString("role"),
+                rs.getString("email"),
+                rs.getString("contact_number"),
+                rs.getString("password"),
+                rs.getString("status"),
+                rs.getString("date_created")
+            };
+            dtm.addRow(obj);
+        }
+    } catch (Exception ex) {
+        System.out.println(ex);
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -32,10 +100,9 @@ public class createaccount extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton2 = new javax.swing.JButton();
+        jDelete = new javax.swing.JButton();
         jEdit = new javax.swing.JButton();
         jRegister = new javax.swing.JButton();
-        jPassword = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jPhoneNumber = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
@@ -55,11 +122,15 @@ public class createaccount extends javax.swing.JFrame {
         jaccTable = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         jRole1 = new javax.swing.JComboBox<>();
         jLabel12 = new javax.swing.JLabel();
         jFirstName1 = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
+        jSeparator3 = new javax.swing.JSeparator();
+        jPassword = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -69,16 +140,21 @@ public class createaccount extends javax.swing.JFrame {
         });
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jButton2.setText("Delete");
-        getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 710, 95, 41));
+        jDelete.setText("Delete");
+        jDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jDeleteActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 95, 41));
 
-        jEdit.setText("Edit");
+        jEdit.setText("Update");
         jEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jEditActionPerformed(evt);
             }
         });
-        getContentPane().add(jEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 730, 95, 41));
+        getContentPane().add(jEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 350, 95, 41));
 
         jRegister.setText("Register");
         jRegister.addActionListener(new java.awt.event.ActionListener() {
@@ -86,20 +162,12 @@ public class createaccount extends javax.swing.JFrame {
                 jRegisterActionPerformed(evt);
             }
         });
-        getContentPane().add(jRegister, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 710, 95, 41));
-
-        jPassword.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jPassword.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordActionPerformed(evt);
-            }
-        });
-        getContentPane().add(jPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 670, 240, 37));
+        getContentPane().add(jRegister, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 540, 160, 50));
 
         jLabel7.setBackground(new java.awt.Color(255, 255, 255));
         jLabel7.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel7.setText("Password:");
-        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 640, -1, -1));
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 440, -1, -1));
 
         jPhoneNumber.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPhoneNumber.addActionListener(new java.awt.event.ActionListener() {
@@ -107,12 +175,12 @@ public class createaccount extends javax.swing.JFrame {
                 jPhoneNumberActionPerformed(evt);
             }
         });
-        getContentPane().add(jPhoneNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 600, 240, 30));
+        getContentPane().add(jPhoneNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 550, 220, 30));
 
         jLabel5.setBackground(new java.awt.Color(255, 255, 255));
         jLabel5.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel5.setText("Phone Number:");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 570, -1, -1));
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 540, -1, -1));
 
         jEmail.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jEmail.addActionListener(new java.awt.event.ActionListener() {
@@ -120,12 +188,12 @@ public class createaccount extends javax.swing.JFrame {
                 jEmailActionPerformed(evt);
             }
         });
-        getContentPane().add(jEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 530, 240, 40));
+        getContentPane().add(jEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 500, 240, 30));
 
         jLabel8.setBackground(new java.awt.Color(255, 255, 255));
         jLabel8.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel8.setText(" Email:");
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 500, -1, -1));
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 490, -1, -1));
 
         jUserName.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jUserName.addActionListener(new java.awt.event.ActionListener() {
@@ -133,12 +201,12 @@ public class createaccount extends javax.swing.JFrame {
                 jUserNameActionPerformed(evt);
             }
         });
-        getContentPane().add(jUserName, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 470, 240, 30));
+        getContentPane().add(jUserName, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 410, 240, 30));
 
         jLabel10.setBackground(new java.awt.Color(255, 255, 255));
         jLabel10.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel10.setText("Username:");
-        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 440, -1, -1));
+        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 410, -1, -1));
 
         jLastName.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLastName.addActionListener(new java.awt.event.ActionListener() {
@@ -146,12 +214,12 @@ public class createaccount extends javax.swing.JFrame {
                 jLastNameActionPerformed(evt);
             }
         });
-        getContentPane().add(jLastName, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 400, 240, 40));
+        getContentPane().add(jLastName, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 510, 240, 30));
 
         jLabel9.setBackground(new java.awt.Color(255, 255, 255));
         jLabel9.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel9.setText("Last Name:");
-        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 370, -1, -1));
+        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 500, -1, -1));
 
         jMiddleName.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jMiddleName.addActionListener(new java.awt.event.ActionListener() {
@@ -159,12 +227,12 @@ public class createaccount extends javax.swing.JFrame {
                 jMiddleNameActionPerformed(evt);
             }
         });
-        getContentPane().add(jMiddleName, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 330, 240, 40));
+        getContentPane().add(jMiddleName, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 460, 240, 40));
 
         jLabel4.setBackground(new java.awt.Color(255, 255, 255));
         jLabel4.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel4.setText("Middle Name:");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 300, -1, -1));
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 450, -1, -1));
 
         jUserid.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jUserid.addActionListener(new java.awt.event.ActionListener() {
@@ -172,12 +240,12 @@ public class createaccount extends javax.swing.JFrame {
                 jUseridActionPerformed(evt);
             }
         });
-        getContentPane().add(jUserid, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 190, 150, 23));
+        getContentPane().add(jUserid, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 410, 150, 23));
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
         jLabel1.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel1.setText("ID:");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 160, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 410, -1, -1));
 
         jRole.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Active", "Inactive" }));
@@ -186,27 +254,27 @@ public class createaccount extends javax.swing.JFrame {
                 jRoleActionPerformed(evt);
             }
         });
-        getContentPane().add(jRole, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 130, 100, 30));
+        getContentPane().add(jRole, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 480, 120, 30));
 
         jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel6.setText("Status:");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 100, -1, -1));
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 470, 80, 40));
 
         jaccTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "First Name", "Last Name", "Username", "Role", "Email", "Number", "Password"
+                "ID", "First Name", "Middle Name", "Last Name", "Username", "Role", "Email", "Number", "Password", "Status", "Date Created"
             }
         ));
         jScrollPane1.setViewportView(jaccTable);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 960, 614));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, 1110, 220));
 
         jPanel2.setBackground(new java.awt.Color(0, 102, 153));
         jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -216,29 +284,41 @@ public class createaccount extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Create User");
 
+        jButton1.setBackground(new java.awt.Color(0, 102, 153));
+        jButton1.setIcon(new javax.swing.ImageIcon("C:\\Users\\rpand\\Documents\\GitHub\\Andulana_EDP\\src\\andulanarobert1\\images\\return.png")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(27, 27, 27)
-                .addComponent(jLabel2)
-                .addContainerGap(1025, Short.MAX_VALUE))
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 815, Short.MAX_VALUE)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(23, 23, 23))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(25, Short.MAX_VALUE)
-                .addComponent(jLabel2)
+                .addContainerGap(16, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
                 .addGap(23, 23, 23))
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, 1260, -1));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, 1160, -1));
 
         jLabel11.setBackground(new java.awt.Color(255, 255, 255));
         jLabel11.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel11.setText("Role:");
-        getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 100, -1, -1));
+        getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 440, -1, -1));
 
         jRole1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jRole1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Super Admin", "Manager", "Cashier", "Inventory Clerk" }));
@@ -247,12 +327,12 @@ public class createaccount extends javax.swing.JFrame {
                 jRole1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jRole1, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 130, 140, 30));
+        getContentPane().add(jRole1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 440, 130, 30));
 
         jLabel12.setBackground(new java.awt.Color(255, 255, 255));
         jLabel12.setFont(new java.awt.Font("Swis721 BT", 3, 18)); // NOI18N
         jLabel12.setText("First Name:");
-        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 220, -1, -1));
+        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 410, -1, -1));
 
         jFirstName1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jFirstName1.addActionListener(new java.awt.event.ActionListener() {
@@ -260,7 +340,7 @@ public class createaccount extends javax.swing.JFrame {
                 jFirstName1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jFirstName1, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 250, 240, 40));
+        getContentPane().add(jFirstName1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 410, 240, 40));
 
         jButton3.setText("Clear");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -268,7 +348,14 @@ public class createaccount extends javax.swing.JFrame {
                 jButton3ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 730, 95, 41));
+        getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 350, 90, 41));
+
+        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        getContentPane().add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 410, 30, 120));
+
+        jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        getContentPane().add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 410, 30, 120));
+        getContentPane().add(jPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 450, 240, 30));
 
         pack();
         setLocationRelativeTo(null);
@@ -290,10 +377,6 @@ public class createaccount extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jPhoneNumberActionPerformed
 
-    private void jPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jPasswordActionPerformed
-
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
       Connection con = DatabaseConnection.dbConnection(); 
       ResultSet rs;
@@ -303,45 +386,54 @@ public class createaccount extends javax.swing.JFrame {
            PreparedStatement pst  = con.prepareStatement("SELECT * FROM users ORDER BY user_id ASC");
            rs = pst.executeQuery();
            while(rs.next()){
-               Object obj[] = {rs.getInt("user_id"), rs.getString("first_name"), rs.getString("last_name"), rs.getString("username"),
-                  rs.getString("role"), rs.getString("email"),   rs.getString("contact_number"), rs.getString("password"),rs.getString("date_created")};
+               Object obj[] = {rs.getInt("user_id"), rs.getString("first_name"),rs.getString("middle_name"), rs.getString("last_name"), rs.getString("username"),
+                  rs.getString("role"), rs.getString("email"),   rs.getString("contact_number"), rs.getString("password"), rs.getString("status"), rs.getString("date_created")};
                dtm.addRow(obj);
            }
                }catch (Exception ex){
                    System.out.println(ex);
                }
+      
+      
     }//GEN-LAST:event_formWindowActivated
 
     private void jRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRegisterActionPerformed
         // TODO add your handling code here:
         Connection con = DatabaseConnection.dbConnection();
             String user_id = jUserid.getText();
-            String first_name = jMiddleName.getText();
+            String first_name = jFirstName1.getText();
+            String middle_name = jMiddleName.getText();
             String last_name = jLastName.getText();
             String username = jUserName.getText();
             String email = jEmail.getText();
             String contact_number = jPhoneNumber.getText();
             String password = jPassword.getText();   
-            String role = jRole.getSelectedItem().toString();
+            String role = jRole1.getSelectedItem().toString();
+            
+            
             try{
                  PreparedStatement pst = con.prepareStatement(
-    "INSERT INTO users (user_id, first_name, last_name, username, role, email, contact_number, password) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+    "INSERT INTO users (user_id, first_name, middle_name, last_name, username, role, email, contact_number, password) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)"
 );
                 
                 pst.setString(1, user_id);
                 pst.setString(2, first_name);
-                pst.setString(3, last_name);
-                pst.setString(4, username);
-                pst.setString(5, role);
-                pst.setString(6, email);
-                pst.setString(7, contact_number);
-                pst.setString(8, password);
+                pst.setString(3, middle_name);
+                pst.setString(4, last_name);
+                pst.setString(5, username);
+                pst.setString(6, role);
+                pst.setString(7, email);
+                pst.setString(8, contact_number);
+                pst.setString(9, password);
                
                
                 pst.executeUpdate();
+                clearFields();
                 
 
                 JOptionPane.showMessageDialog(null,"Data added successfully");
+                formWindowActivated(null);
+                clearFields();
             }
             catch(Exception ex){
                 System.out.println(ex);
@@ -363,18 +455,50 @@ public class createaccount extends javax.swing.JFrame {
 
     private void jEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jEditActionPerformed
         // TODO add your handling code here:
-          jUserid.setText("");
-          jMiddleName.setText("");
-          jLastName.setText("");
-          jUserName.setText("");
-          jEmail.setText("");
-          jPhoneNumber.setText("");
-          jPassword.setText("");
-          jRole.setSelectedItem(0);
+           String user_id = jUserid.getText();
+    String first_name = jFirstName1.getText();
+    String middle_name = jMiddleName.getText();
+    String last_name = jLastName.getText();
+    String username = jUserName.getText();
+    String role = jRole1.getSelectedItem().toString();
+    String email = jEmail.getText();
+    String contact_number = jPhoneNumber.getText();
+    String password = jPassword.getText();
+    String status = jRole.getSelectedItem().toString();
+
+    try {
+        Connection con = DatabaseConnection.dbConnection();
+        String sql = "UPDATE users SET first_name=?, middle_name=?, last_name=?, username=?, role=?, email=?, contact_number=?, password=?, status=? WHERE user_id=?";
+        PreparedStatement pst = con.prepareStatement(sql);
+
+        pst.setString(1, first_name);
+        pst.setString(2, middle_name);
+        pst.setString(3, last_name);
+        pst.setString(4, username);
+        pst.setString(5, role);
+        pst.setString(6, email);
+        pst.setString(7, contact_number);
+        pst.setString(8, password);
+        pst.setString(9, status);
+        pst.setString(10, user_id);
+
+        int updated = pst.executeUpdate();
+
+        if (updated > 0) {
+            JOptionPane.showMessageDialog(this, "User updated successfully!");
+            loadUserTable();  // method to refresh the table
+        } else {
+            JOptionPane.showMessageDialog(this, "Update failed. Please check the user ID.");
+        }
+
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, ex.getMessage());
+    }
     }//GEN-LAST:event_jEditActionPerformed
 
     private void jRole1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRole1ActionPerformed
         // TODO add your handling code here:
+
     }//GEN-LAST:event_jRole1ActionPerformed
 
     private void jFirstName1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFirstName1ActionPerformed
@@ -383,7 +507,67 @@ public class createaccount extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
+     jUserid.setText("");
+    jFirstName1.setText("");
+    jMiddleName.setText("");
+    jLastName.setText("");
+    jUserName.setText("");
+    jRole1.setSelectedIndex(0); // ✅ was setSelectedItem(0)
+    jEmail.setText("");
+    jPhoneNumber.setText("");
+    jPassword.setText("");
+
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeleteActionPerformed
+        // TODO add your handling code here:
+     String user_id = jUserid.getText();
+
+    if (user_id.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Please select a user to delete.");
+        return;
+    }
+
+    int confirm = JOptionPane.showConfirmDialog(null, 
+        "Are you sure you want to delete this user?", 
+        "Confirm Delete", JOptionPane.YES_NO_OPTION);
+        
+    if (confirm == JOptionPane.YES_OPTION) {
+        try {
+            Connection con = DatabaseConnection.dbConnection();
+            String sql = "DELETE FROM users WHERE user_id=?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, user_id);
+
+            int deleted = pst.executeUpdate();
+
+            if (deleted > 0) {
+                JOptionPane.showMessageDialog(null, "User deleted successfully!");
+                clearFields();
+                loadUserTable();
+            } else {
+                JOptionPane.showMessageDialog(null, "Delete failed. Please check the user ID.");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
+    
+
+    }//GEN-LAST:event_jDeleteActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        int confirm = JOptionPane.showConfirmDialog(null, "Return to Dashboard", "Are you sure?",JOptionPane.YES_NO_OPTION);
+        if(confirm == YES_OPTION){
+         Dashboard db = new  Dashboard();
+        db.show();
+        this.dispose();
+        }else{
+            
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -421,8 +605,9 @@ public class createaccount extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jDelete;
     private javax.swing.JButton jEdit;
     private javax.swing.JTextField jEmail;
     private javax.swing.JTextField jFirstName1;
@@ -440,12 +625,14 @@ public class createaccount extends javax.swing.JFrame {
     private javax.swing.JTextField jLastName;
     private javax.swing.JTextField jMiddleName;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JTextField jPassword;
+    private javax.swing.JPasswordField jPassword;
     private javax.swing.JTextField jPhoneNumber;
     private javax.swing.JButton jRegister;
     private javax.swing.JComboBox<String> jRole;
     private javax.swing.JComboBox<String> jRole1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTextField jUserName;
     private javax.swing.JTextField jUserid;
     private javax.swing.JTable jaccTable;
