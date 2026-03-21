@@ -610,8 +610,11 @@ public class Inventory extends javax.swing.JFrame {
         });
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jTabbedPane1.setBackground(new java.awt.Color(255, 255, 255));
+
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jtablestockin.setModel(new javax.swing.table.DefaultTableModel(
@@ -692,6 +695,7 @@ public class Inventory extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Stock In", jPanel2);
 
+        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
         jPanel8.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jtablestockout.setModel(new javax.swing.table.DefaultTableModel(
@@ -785,6 +789,7 @@ public class Inventory extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Stock Out", jPanel3);
 
+        jPanel10.setBackground(new java.awt.Color(255, 255, 255));
         jPanel10.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel12.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
@@ -882,6 +887,8 @@ public class Inventory extends javax.swing.JFrame {
         );
 
         jTabbedPane1.addTab("Stock Overview", jPanel4);
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
 
         jPanel13.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 

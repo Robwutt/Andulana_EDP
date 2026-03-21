@@ -21,6 +21,7 @@ public class LoginScreen extends javax.swing.JFrame {
     public LoginScreen() {
         initComponents();
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -117,16 +118,21 @@ public class LoginScreen extends javax.swing.JFrame {
         rs = pst.executeQuery();
 
         if(rs.next()){
+    String fname = rs.getString("first_name");
+    String role = rs.getString("role");
 
-            String fname = rs.getString("first_name");
-            String role = rs.getString("role");
+    // ✅ ADD THESE 3 LINES:
+    SessionManager.loggedInUserId   = rs.getInt("user_id");
+    SessionManager.loggedInUsername = rs.getString("username");
+    SessionManager.loggedInRole     = role;
+    SessionManager.loggedInFirstName = fname; // ✅ ADD THIS
 
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    "Welcome " + fname + " (" + role + ")");
-            
-        Dashboard db = new  Dashboard();
-        db.show();
-        this.dispose();
+    javax.swing.JOptionPane.showMessageDialog(this,
+            "Welcome " + fname + " (" + role + ")");
+    
+    Dashboard db = new Dashboard();
+    db.show();
+    this.dispose();
 
             // open next form
             // new Dashboard().setVisible(true);
