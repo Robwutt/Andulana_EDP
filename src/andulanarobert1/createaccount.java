@@ -22,30 +22,80 @@ public class createaccount extends javax.swing.JFrame {
      */
     public createaccount() {
         initComponents();
-        jaccTable.addMouseListener(new java.awt.event.MouseAdapter() {
-    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        jaccTable.getSelectionModel().addListSelectionListener(e -> {
+    if (!e.getValueIsAdjusting()) {
         int selectedRow = jaccTable.getSelectedRow();
         if (selectedRow >= 0) {
-            jUserid.setText(jaccTable.getValueAt(selectedRow, 0).toString());
+            String userId = jaccTable.getValueAt(selectedRow, 0).toString();
+
+            jUserid.setText(userId);
             jFirstName1.setText(jaccTable.getValueAt(selectedRow, 1).toString());
             jMiddleName.setText(jaccTable.getValueAt(selectedRow, 2).toString());
             jLastName.setText(jaccTable.getValueAt(selectedRow, 3).toString());
-            jUserName.setText(jaccTable.getValueAt(selectedRow, 4).toString());
-            jRole1.setSelectedItem(jaccTable.getValueAt(selectedRow, 5).toString());
-            jEmail.setText(jaccTable.getValueAt(selectedRow, 6).toString());
-            jPhoneNumber.setText(jaccTable.getValueAt(selectedRow, 7).toString());
-            jPassword.setText(jaccTable.getValueAt(selectedRow, 8).toString());
-            jRole.setSelectedItem(jaccTable.getValueAt(selectedRow, 9).toString());
+            jEmail.setText(jaccTable.getValueAt(selectedRow, 4).toString());
+            jPhoneNumber.setText(jaccTable.getValueAt(selectedRow, 5).toString());
+            jRole.setSelectedItem(jaccTable.getValueAt(selectedRow, 6).toString()); // Status
+
+            // Fetch username, role, password from DB
+            try {
+                Connection con = DatabaseConnection.dbConnection();
+                PreparedStatement pst = con.prepareStatement(
+                    "SELECT username, role, password FROM users WHERE user_id=?");
+                pst.setString(1, userId);
+                ResultSet rs = pst.executeQuery();
+                if (rs.next()) {
+                    jUserName.setText(rs.getString("username"));
+                    jPassword.setText(rs.getString("password"));
+
+                    String dbRole = rs.getString("role");
+                    boolean roleFound = false;
+                    for (int i = 0; i < jRole1.getItemCount(); i++) {
+                        if (jRole1.getItemAt(i).equalsIgnoreCase(dbRole)) {
+                            jRole1.setSelectedIndex(i);
+                            roleFound = true;
+                            break;
+                        }
+                    }
+                    if (!roleFound) {
+                        jRole1.setSelectedIndex(0);
+                    }
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error loading user: " + ex.getMessage());
+            }
         }
     }
 });
-        this.addMouseListener(new java.awt.event.MouseAdapter() {
-    public void mouseClicked(java.awt.event.MouseEvent evt) {
-        jaccTable.clearSelection(); // deselect table
-        clearFields();
         
-    }
-});
+
+        
+          // EXISTING - blocks non-digits and caps at 11
+    jPhoneNumber.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isDigit(c)) {
+                evt.consume();
+            }
+            if (jPhoneNumber.getText().length() >= 11) {
+                evt.consume();
+            }
+        }
+    });
+
+    // ADD THIS - warning when user clicks away
+    jPhoneNumber.addFocusListener(new java.awt.event.FocusAdapter() {
+        public void focusLost(java.awt.event.FocusEvent evt) {
+            String ph = jPhoneNumber.getText().trim();
+            if (!ph.isEmpty() && ph.length() != 11) {
+                JOptionPane.showMessageDialog(null,
+                    "Phone number must be exactly 11 digits!",
+                    "Invalid Phone Number",
+                    JOptionPane.WARNING_MESSAGE);
+                jPhoneNumber.requestFocusInWindow();
+            }
+        }
+    });
+        
     }
     
     private void clearFields() {
@@ -67,20 +117,16 @@ private void loadUserTable() {
     Connection con = DatabaseConnection.dbConnection();
     DefaultTableModel dtm = (DefaultTableModel) jaccTable.getModel();
     dtm.setRowCount(0);
-
     try {
-        ResultSet rs = con.prepareStatement("SELECT * FROM users ORDER BY user_id ASC").executeQuery();
+        ResultSet rs = con.prepareStatement("SELECT * FROM users WHERE user_id != 2023028 ORDER BY user_id ASC").executeQuery();
         while (rs.next()) {
             Object[] obj = {
                 rs.getInt("user_id"),
                 rs.getString("first_name"),
                 rs.getString("middle_name"),
                 rs.getString("last_name"),
-                rs.getString("username"),
-                rs.getString("role"),
                 rs.getString("email"),
                 rs.getString("contact_number"),
-                rs.getString("password"),
                 rs.getString("status"),
                 rs.getString("date_created")
             };
@@ -263,13 +309,13 @@ private void loadUserTable() {
 
         jaccTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "First Name", "Middle Name", "Last Name", "Username", "Role", "Email", "Number", "Password", "Status", "Date Created"
+                "ID", "First Name", "Middle Name", "Last Name", "Email", "Number", "Status", "Date Created"
             }
         ));
         jScrollPane1.setViewportView(jaccTable);
@@ -321,7 +367,7 @@ private void loadUserTable() {
         getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 440, -1, -1));
 
         jRole1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jRole1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Super Admin", "Manager", "Cashier", "Inventory Clerk" }));
+        jRole1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Manager", "Cashier", "Inventory Clerk" }));
         jRole1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRole1ActionPerformed(evt);
@@ -378,23 +424,29 @@ private void loadUserTable() {
     }//GEN-LAST:event_jPhoneNumberActionPerformed
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-      Connection con = DatabaseConnection.dbConnection(); 
-      ResultSet rs;
-      DefaultTableModel dtm = (DefaultTableModel) jaccTable.getModel(); 
-      dtm.setRowCount(0);
-      try{
-           PreparedStatement pst  = con.prepareStatement("SELECT * FROM users ORDER BY user_id ASC");
-           rs = pst.executeQuery();
-           while(rs.next()){
-               Object obj[] = {rs.getInt("user_id"), rs.getString("first_name"),rs.getString("middle_name"), rs.getString("last_name"), rs.getString("username"),
-                  rs.getString("role"), rs.getString("email"),   rs.getString("contact_number"), rs.getString("password"), rs.getString("status"), rs.getString("date_created")};
-               dtm.addRow(obj);
-           }
-               }catch (Exception ex){
-                   System.out.println(ex);
-               }
-      
-      
+        Connection con = DatabaseConnection.dbConnection();
+    ResultSet rs;
+    DefaultTableModel dtm = (DefaultTableModel) jaccTable.getModel();
+    dtm.setRowCount(0);
+    try {
+        PreparedStatement pst = con.prepareStatement("SELECT * FROM users WHERE user_id != 2023028 ORDER BY user_id ASC");
+        rs = pst.executeQuery();
+        while (rs.next()) {
+            Object obj[] = {
+                rs.getInt("user_id"),
+                rs.getString("first_name"),
+                rs.getString("middle_name"),
+                rs.getString("last_name"),
+                rs.getString("email"),
+                rs.getString("contact_number"),
+                rs.getString("status"),
+                rs.getString("date_created")
+            };
+            dtm.addRow(obj);
+        }
+    } catch (Exception ex) {
+        System.out.println(ex);
+    }
     }//GEN-LAST:event_formWindowActivated
 
     private void jRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRegisterActionPerformed
@@ -410,7 +462,13 @@ private void loadUserTable() {
             String password = jPassword.getText();   
             String role = jRole1.getSelectedItem().toString();
             
-            
+            if (contact_number.length() != 11) {
+    JOptionPane.showMessageDialog(null, "Phone number must be exactly 11 digits.");
+    return;
+}if (email.isEmpty() || !email.contains("@") || !email.contains(".")) {
+    JOptionPane.showMessageDialog(null, "Please enter a valid email address (e.g. name@gmail.com, name@yahoo.com)");
+    return;
+}
             try{
                  PreparedStatement pst = con.prepareStatement(
     "INSERT INTO users (user_id, first_name, middle_name, last_name, username, role, email, contact_number, password) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)"

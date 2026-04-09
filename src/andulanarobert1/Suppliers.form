@@ -360,12 +360,18 @@
         <Component class="javax.swing.JTextField" name="jsupcp">
         </Component>
         <Component class="javax.swing.JTextField" name="jsupcn">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jsupcnActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="jsupemail">
         </Component>
         <Component class="javax.swing.JTextField" name="jsupadd">
         </Component>
         <Component class="javax.swing.JTextField" name="jsupid">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jsupidActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel9">
           <Properties>

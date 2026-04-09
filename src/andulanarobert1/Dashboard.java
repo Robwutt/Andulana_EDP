@@ -24,6 +24,40 @@ public class Dashboard extends javax.swing.JFrame {
         startClock();
         
           jcurrentusername.setText(SessionManager.loggedInFirstName + "!");
+
+    // PASTE THE ROLE CHECK BLOCK RIGHT HERE
+    String role = SessionManager.loggedInRole.trim();
+
+    if (!role.equalsIgnoreCase("Super Admin")) {
+        jAccounts.setEnabled(false);
+        jAccounts.setToolTipText("Super Admin Only!");
+        jLabel8.setForeground(new java.awt.Color(150, 150, 150));
+    }
+
+    if (role.equalsIgnoreCase("Cashier")) {
+        jButton2.setEnabled(false);
+        jButton2.setToolTipText("Access Denied!");
+        jLabel4.setForeground(new java.awt.Color(150, 150, 150));
+
+        jSupplies.setEnabled(false);
+        jSupplies.setToolTipText("Access Denied!");
+        jLabel7.setForeground(new java.awt.Color(150, 150, 150));
+    }
+
+    if (role.equalsIgnoreCase("Inventory Clerk")) {
+        jButton1.setEnabled(false);
+        jButton1.setToolTipText("Access Denied!");
+        jLabel2.setForeground(new java.awt.Color(150, 150, 150));
+
+        jCategories.setEnabled(false);
+        jCategories.setToolTipText("Access Denied!");
+        jLabel6.setForeground(new java.awt.Color(150, 150, 150));
+
+        jButton3.setEnabled(false);
+        jButton3.setToolTipText("Access Denied!");
+        jLabel24.setForeground(new java.awt.Color(150, 150, 150));
+    }
+
     }
     private void loadDashboardCharts() {
     loadDailyChart();
@@ -106,41 +140,54 @@ private void loadDailyChart() {
 }
 
 private void loadMonthlyChart() {
-    org.jfree.data.category.DefaultCategoryDataset dataset =
-        new org.jfree.data.category.DefaultCategoryDataset();
+    org.jfree.data.general.DefaultPieDataset dataset =
+        new org.jfree.data.general.DefaultPieDataset();
 
     java.sql.Connection con = DatabaseConnection.dbConnection();
     try {
         java.sql.ResultSet rs = con.prepareStatement(
-            "SELECT DATE_FORMAT(sale_date, '%Y-%m') AS month, SUM(total_amount) AS total " +
-            "FROM sales " +
-            "GROUP BY DATE_FORMAT(sale_date, '%Y-%m') ORDER BY month ASC"
-        ).executeQuery();
+    "SELECT DATE_FORMAT(sale_date, '%M %Y') AS month, SUM(total_amount) AS total " +
+    "FROM sales " +
+    "GROUP BY DATE_FORMAT(sale_date, '%Y-%m') ORDER BY DATE_FORMAT(sale_date, '%Y-%m') ASC"
+).executeQuery();
         while (rs.next()) {
-            dataset.addValue(rs.getDouble("total"), "Sales", rs.getString("month"));
+            dataset.setValue(rs.getString("month"), rs.getDouble("total"));
         }
     } catch (Exception e) {
         javax.swing.JOptionPane.showMessageDialog(this, "Monthly chart error: " + e.getMessage());
     }
 
-    org.jfree.chart.JFreeChart chart = org.jfree.chart.ChartFactory.createBarChart(
+    org.jfree.chart.JFreeChart chart = org.jfree.chart.ChartFactory.createPieChart(
         "Monthly Sales Chart",
-        "Month", "Sales (₱)",
         dataset,
-        org.jfree.chart.plot.PlotOrientation.VERTICAL,
-        true, true, false
+        true,  // legend
+        true,  // tooltips
+        false  // URLs
     );
 
     // Style the chart
     chart.setBackgroundPaint(java.awt.Color.WHITE);
-    org.jfree.chart.plot.CategoryPlot plot =
-        (org.jfree.chart.plot.CategoryPlot) chart.getPlot();
+    org.jfree.chart.plot.PiePlot plot =
+        (org.jfree.chart.plot.PiePlot) chart.getPlot();
     plot.setBackgroundPaint(java.awt.Color.WHITE);
-    plot.setRangeGridlinePaint(java.awt.Color.LIGHT_GRAY);
+    plot.setOutlinePaint(null);
+    plot.setShadowPaint(null);
 
-    org.jfree.chart.renderer.category.BarRenderer renderer =
-        (org.jfree.chart.renderer.category.BarRenderer) plot.getRenderer();
-    renderer.setSeriesPaint(0, new java.awt.Color(255, 102, 153));
+    // Custom colors per slice
+    java.util.List<String> keys = new java.util.ArrayList<>();
+    for (int i = 0; i < dataset.getItemCount(); i++) {
+        keys.add(dataset.getKey(i).toString());
+    }
+    java.awt.Color[] colors = {
+        new java.awt.Color(0, 102, 153),
+    new java.awt.Color(255, 204, 0),
+    new java.awt.Color(0, 153, 204),
+    new java.awt.Color(255, 230, 80),
+    new java.awt.Color(0, 76, 120)
+    };
+    for (int i = 0; i < keys.size(); i++) {
+        plot.setSectionPaint(keys.get(i), colors[i % colors.length]);
+    }
 
     org.jfree.chart.ChartPanel chartPanel =
         new org.jfree.chart.ChartPanel(chart);
@@ -401,16 +448,14 @@ private void loadTopSellingChart() {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jLabel5)
-                        .addGap(137, 137, 137)
-                        .addComponent(jLabel10))
-                    .addComponent(jAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(42, 42, 42)
+                .addComponent(jAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(183, 183, 183)
                 .addComponent(LogoutBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(60, 60, 60))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel5)
+                .addGap(204, 204, 204)
+                .addComponent(jLabel10)
+                .addGap(179, 179, 179))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(428, 428, 428)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -450,6 +495,7 @@ private void loadTopSellingChart() {
                                     .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))))
                         .addGap(6, 6, 6))
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
                         .addComponent(LogoutBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -504,10 +550,10 @@ private void loadTopSellingChart() {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jcurrentusername, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jcurrentusername, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel12)
-                .addGap(159, 159, 159)
+                .addGap(696, 696, 696)
                 .addComponent(jPanelclock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(41, 41, 41))
         );
@@ -520,8 +566,8 @@ private void loadTopSellingChart() {
                     .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel11)
-                            .addComponent(jLabel12)
-                            .addComponent(jcurrentusername))
+                            .addComponent(jcurrentusername)
+                            .addComponent(jLabel12))
                         .addComponent(jLabel1)))
                 .addContainerGap(10, Short.MAX_VALUE))
         );
@@ -562,7 +608,6 @@ private void loadTopSellingChart() {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(62, 62, 62)
                 .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -588,13 +633,14 @@ private void loadTopSellingChart() {
                 .addComponent(jLabel22)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(totalstock, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(31, 31, 31)
+                .addGap(32, 32, 32)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel18)
                     .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -731,11 +777,11 @@ private void loadTopSellingChart() {
         jDailysalesgraph.setLayout(jDailysalesgraphLayout);
         jDailysalesgraphLayout.setHorizontalGroup(
             jDailysalesgraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 470, Short.MAX_VALUE)
+            .addGap(0, 577, Short.MAX_VALUE)
         );
         jDailysalesgraphLayout.setVerticalGroup(
             jDailysalesgraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 394, Short.MAX_VALUE)
         );
 
         jMonthlysaleschart.setBackground(new java.awt.Color(255, 255, 255));
@@ -745,11 +791,11 @@ private void loadTopSellingChart() {
         jMonthlysaleschart.setLayout(jMonthlysaleschartLayout);
         jMonthlysaleschartLayout.setHorizontalGroup(
             jMonthlysaleschartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 443, Short.MAX_VALUE)
+            .addGap(0, 513, Short.MAX_VALUE)
         );
         jMonthlysaleschartLayout.setVerticalGroup(
             jMonthlysaleschartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 142, Short.MAX_VALUE)
+            .addGap(0, 215, Short.MAX_VALUE)
         );
 
         jtopsellingproducts.setBackground(new java.awt.Color(255, 255, 255));
@@ -763,44 +809,48 @@ private void loadTopSellingChart() {
         );
         jtopsellingproductsLayout.setVerticalGroup(
             jtopsellingproductsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 142, Short.MAX_VALUE)
+            .addGap(0, 247, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42)
+                .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jDailysalesgraph, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jMonthlysaleschart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jtopsellingproducts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(41, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addGap(1, 1, 1)))
+                .addContainerGap(24, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jMonthlysaleschart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGap(18, 18, 18)
                                 .addComponent(jtopsellingproducts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jDailysalesgraph, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addGap(23, 23, Short.MAX_VALUE))
+                            .addComponent(jDailysalesgraph, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 49, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         pack();

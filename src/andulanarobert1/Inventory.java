@@ -33,29 +33,29 @@ public class Inventory extends javax.swing.JFrame {
         loadTransactionHistory();
         loadCategoryFilter();
 
-        // Stock In table - when you click a row, loads product image and date
-        jtablestockin.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int row = jtablestockin.getSelectedRow();
-                if (row >= 0) {
-                    String productId = jtablestockin.getValueAt(row, 0).toString();
-                    loadProductImage(productId, jLabel8); // jLabel8 = product image box in Stock In
-                    jLabel6.setText(new java.util.Date().toString()); // jLabel6 = date label in Stock In
-                }
-            }
-        });
+        // Stock In table selection
+jtablestockin.getSelectionModel().addListSelectionListener(e -> {
+    if (!e.getValueIsAdjusting()) {
+        int row = jtablestockin.getSelectedRow();
+        if (row >= 0) {
+            String productId = jtablestockin.getValueAt(row, 0).toString();
+            loadProductImage(productId, jLabel8);
+            jLabel6.setText(new java.util.Date().toString());
+        }
+    }
+});
 
-        // Stock Out table - when you click a row, loads product image and date
-        jtablestockout.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int row = jtablestockout.getSelectedRow();
-                if (row >= 0) {
-                    String productId = jtablestockout.getValueAt(row, 0).toString();
-                    loadProductImage(productId, jLabel20); // jLabel20 = product image box in Stock Out
-                    jLabel18.setText(new java.util.Date().toString()); // jLabel18 = date label in Stock Out
-                }
-            }
-        });
+// Stock Out table selection
+jtablestockout.getSelectionModel().addListSelectionListener(e -> {
+    if (!e.getValueIsAdjusting()) {
+        int row = jtablestockout.getSelectedRow();
+        if (row >= 0) {
+            String productId = jtablestockout.getValueAt(row, 0).toString();
+            loadProductImage(productId, jLabel20);
+            jLabel18.setText(new java.util.Date().toString());
+        }
+    }
+});
 
         // Overview search field - filters table as you type
         jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {

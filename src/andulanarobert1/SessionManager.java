@@ -15,5 +15,6 @@ public class SessionManager {
     public static String loggedInUsername = "";
     public static String loggedInRole     = "";
     public static String loggedInFirstName = "";
+    public static String loggedInStatus   = "";
 
 }

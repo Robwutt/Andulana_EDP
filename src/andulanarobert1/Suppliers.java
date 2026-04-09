@@ -17,37 +17,64 @@ import static javax.swing.JOptionPane.YES_OPTION;
  * @author rpand
  */
 public class Suppliers extends javax.swing.JFrame {
-
+private int selectedSupplierId = -1; 
     /**
      * Creates new form Suppliers
      */
     public Suppliers() {
         initComponents();
-        jsuptable.addMouseListener(new java.awt.event.MouseAdapter() {
-    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        jsupid.setEditable(false);
+jsupid.setFocusable(false);
+
+jsupcn.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isDigit(c)) {
+                evt.consume();
+            }
+            if (jsupcn.getText().length() >= 11) {
+                evt.consume();
+            }
+        }
+    });
+
+    jsupcn.addFocusListener(new java.awt.event.FocusAdapter() {
+        public void focusLost(java.awt.event.FocusEvent evt) {
+            String cn = jsupcn.getText().trim();
+            if (!cn.isEmpty() && cn.length() != 11) {
+                JOptionPane.showMessageDialog(null,
+                    "Contact number must be exactly 11 digits!",
+                    "Invalid Contact Number",
+                    JOptionPane.WARNING_MESSAGE);
+                jsupcn.requestFocusInWindow();
+            }
+        }
+    });
+         jsuptable.addMouseListener(new java.awt.event.MouseAdapter() {
+         public void mouseClicked(java.awt.event.MouseEvent evt) {
         int selectedRow = jsuptable.getSelectedRow();
         if (selectedRow >= 0) {
-            jsupid.setText(jsuptable.getValueAt(selectedRow, 0).toString());
+            selectedSupplierId = Integer.parseInt(jsuptable.getValueAt(selectedRow, 0).toString());
+            jsupid.setText(jsuptable.getValueAt(selectedRow, 0).toString()); // display only
             jsupname.setText(jsuptable.getValueAt(selectedRow, 1).toString());
             jsupcp.setText(jsuptable.getValueAt(selectedRow, 2).toString());
             jsupcn.setText(jsuptable.getValueAt(selectedRow, 3).toString());
             jsupemail.setText(jsuptable.getValueAt(selectedRow, 4).toString());
             jsupadd.setText(jsuptable.getValueAt(selectedRow, 5).toString());
-            
         }
     }
-});
+         });
     }
 
     
     private void clearFields() {
-    jsupid.setText("");
     jsupname.setText("");
     jsupcp.setText("");
     jsupcn.setText("");
     jsupemail.setText("");
     jsupadd.setText("");
-
+    selectedSupplierId = -1;
+   
 }
     
     
@@ -196,6 +223,18 @@ private void loadUserTable() {
         jsupsearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jsupsearchActionPerformed(evt);
+            }
+        });
+
+        jsupcn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jsupcnActionPerformed(evt);
+            }
+        });
+
+        jsupid.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jsupidActionPerformed(evt);
             }
         });
 
@@ -394,36 +433,43 @@ private void loadUserTable() {
     private void jsupregisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jsupregisterActionPerformed
         // TODO add your handling code here:
          Connection con = DatabaseConnection.dbConnection();
-            int supplier_id = Integer.parseInt(jsupid.getText());
-            String supplier_name = jsupname.getText();
-            String contact_person = jsupcp.getText();
-            String contact_number = jsupcn.getText();
-            String email = jsupemail.getText();
-            String address = jsupadd.getText();
-           
-            
-            
-            try{
-                 PreparedStatement pst = con.prepareStatement(
-    "INSERT INTO suppliers (supplier_id , supplier_name, contact_person, contact_number, email, address) " + "VALUES (?, ?, ?, ?, ?, ?)"
-);
-                
-                pst.setInt(1, supplier_id);
-                pst.setString(2, supplier_name);
-                pst.setString(3, contact_person);
-                pst.setString(4, contact_number);
-                pst.setString(5, email);
-                pst.setString(6, address);
-              
-               
-               
-                pst.executeUpdate();               
-                JOptionPane.showMessageDialog(null,"Data added successfully");
-                clearFields();
-            }
-            catch(Exception ex){
-                System.out.println(ex);
-            } 
+    String supplier_name = jsupname.getText();
+    String contact_person = jsupcp.getText();
+    String contact_number = jsupcn.getText();
+    String email = jsupemail.getText();
+    String address = jsupadd.getText();
+
+    if (supplier_name.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Supplier name is required.");
+        return;
+    }
+    if (email.isEmpty() || !email.contains("@") || !email.contains(".")) {
+    JOptionPane.showMessageDialog(null, "Please enter a valid email address (e.g. name@gmail.com, name@yahoo.com)");
+    return;
+    }
+    if (contact_number.length() != 11) {
+    JOptionPane.showMessageDialog(null, "Contact number must be exactly 11 digits.");
+    return;
+
+}
+
+    try {
+        PreparedStatement pst = con.prepareStatement(
+            "INSERT INTO suppliers (supplier_name, contact_person, contact_number, email, address) VALUES (?, ?, ?, ?, ?)"
+        );
+        pst.setString(1, supplier_name);
+        pst.setString(2, contact_person);
+        pst.setString(3, contact_number);
+        pst.setString(4, email);
+        pst.setString(5, address);
+
+        pst.executeUpdate();
+        JOptionPane.showMessageDialog(null, "Supplier added successfully!");
+        clearFields();
+        loadUserTable();
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(null, ex.getMessage());
+    }
     }//GEN-LAST:event_jsupregisterActionPerformed
 
     private void jsupdeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jsupdeleteActionPerformed
@@ -505,6 +551,15 @@ int updated = pst.executeUpdate();
             
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jsupidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jsupidActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jsupidActionPerformed
+
+    private void jsupcnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jsupcnActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_jsupcnActionPerformed
 
     /**
      * @param args the command line arguments
